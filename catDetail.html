@@ -84,7 +84,7 @@
         const cat = cats.find(c => c._id == catId);
 
         if (cat) {
-            document.getElementById('cat-avatar').src = `/pages/images/${cat.name}.png`;
+            document.getElementById('cat-avatar').src = `/images/${cat.name}.png`;
             document.getElementById('cat-name').innerText = cat.name;
             document.getElementById('cat-info').innerText = cat.info;
             
