@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>猫咪详情</title>
+    <style>
+        .cat-detail {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        .avatar {
+            width: 300px;
+            height: 300px;
+            border-radius: 8px;
+            object-fit: cover;
+            display: block;
+            margin: 0 auto;
+        }
+        .cat-name {
+            font-size: 28px;
+            margin: 20px 0;
+            text-align: center;
+            color: #333;
+        }
+        .cat-info {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #666;
+            margin: 15px 0;
+        }
+        .cat-classification {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            margin-top: 10px;
+            color: #555;
+        }
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .back-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="cat-detail">
+        <img class="avatar" id="cat-avatar" src="" alt="猫咪照片">
+        <div class="cat-name" id="cat-name"></div>
+        <div class="cat-info" id="cat-info"></div>
+        <div class="cat-classification" id="cat-classification"></div>
+        <br>
+        <a href="/index.html" class="back-button">返回首页</a>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const catId = urlParams.get('_id');
+        const classification = urlParams.get('classification');
+
+        // 从本地存储获取猫咪数据
+        const storedCats = localStorage.getItem('cats');
+        const cats = storedCats ? JSON.parse(storedCats) : [
+            { _id: 1, name: "英杰", info: "哈哈啊哈哈哈哈哈，我他妈是一只猫，我不活了" },
+            { _id: 2, name: "cat2", info: "详细信息关于cat2" },
+            { _id: 3, name: "cat3", info: "详细信息关于cat3" },
+            { _id: 4, name: "cat4", info: "详细信息关于cat4" },
+            { _id: 5, name: "cat5", info: "详细信息关于cat5" },
+            { _id: 6, name: "cat6", info: "详细信息关于cat6" },
+            { _id: 7, name: "玳瑁猫", info: "这是一只玳瑁猫的详细信息" }
+        ];
+
+        const cat = cats.find(c => c._id == catId);
+
+        if (cat) {
+            document.getElementById('cat-avatar').src = `/pages/images/${cat.name}.png`;
+            document.getElementById('cat-name').innerText = cat.name;
+            document.getElementById('cat-info').innerText = cat.info;
+            
+            if (classification) {
+                document.getElementById('cat-classification').innerText = `分类: ${classification}`;
+            }
+        } else {
+            document.getElementById('cat-name').innerText = "未找到该猫咪信息";
+        }
+    </script>
+</body>
+</html>
