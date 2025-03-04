@@ -98,6 +98,49 @@
             color: #666;
             padding: 20px;
         }
+        .detail-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .back-button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .back-button:hover {
+            background-color: #45a049;
+        }
+        .cat-detail {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .detail-image {
+            width: 300px;
+            height: 300px;
+            border-radius: 8px;
+            object-fit: cover;
+            display: block;
+            margin: 0 auto;
+        }
+        .detail-name {
+            text-align: center;
+            margin: 20px 0;
+            color: #333;
+        }
+        .detail-info {
+            color: #666;
+            line-height: 1.6;
+        }
+        .detail-info p {
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
@@ -208,11 +251,32 @@
             </div>
             <div id="catList"></div>
         </div>
+
+        <!-- 添加猫咪详情页面 -->
+        <div id="catDetailPage" style="display: none;">
+            <div class="detail-container">
+                <button onclick="backToMain()" class="back-button">返回</button>
+                <div class="cat-detail">
+                    <img id="catDetailImage" class="detail-image" src="" alt="猫咪照片">
+                    <h2 id="catDetailName" class="detail-name"></h2>
+                    <div class="detail-info">
+                        <p>分类：<span id="catDetailClassification"></span></p>
+                        <p id="catDetailInfo"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         const navbar = ["在校", "毕业", "休学", "喵星"];
         let currentTab = 0;
+
+        // 添加变量记录上一级页面状态
+        let previousView = {
+            type: 'main', // 'main' 或 'category'
+            classification: '' // 当前查看的分类
+        };
 
         function imageTap() {
             // 处理点击头像的逻辑
@@ -228,28 +292,49 @@
             });
         }
 
-        // 这里是猫咪数据的位置
+        // 修改猫咪数据，为每只猫添加简单描述
         const fostered_cat = [
-            { _id: 1, name: "英杰", classification: "玳瑁及三花" },
-            // { _id: 2, name: "cat2", classification: "橘猫及橘白" }
-            // 在这里添加更多在校的猫
+            { 
+                _id: 1, 
+                name: "英杰", 
+                classification: "玳瑁及三花",
+                info: "英杰是一只非常温顺的公猫，毛色为黑白相间。性格活泼开朗，特别喜欢和同学互动。经常在图书馆附近活动，是学校里最受欢迎的猫咪之一。"
+            },
+            { 
+                _id: 2, 
+                name: "山花", 
+                classification: "玳瑁及三花",
+                info: "山花是一只美丽的三花猫，性格温和。她喜欢在教学楼周围晒太阳，偶尔会和同学玩耍。她的叫声特别好听，就像在唱歌一样。"
+            }
         ];
 
         const unknown_cat = [
-            { _id: 3, name: "大狸", classification: "纯色" },
-            // { _id: 4, name: "cat4", classification: "奶牛" }
-            // 在这里添加更多休学的猫
+            { 
+                _id: 3, 
+                name: "大狸", 
+                classification: "纯色",
+                info: "大狸是一只帅气的黑猫，独来独往的性格让他显得很酷。虽然不太爱和人亲近，但经常在食堂后面守护着这片区域，是位尽职的'保安'。"
+            }
         ];
 
         const dead_cat = [
-            // { _id: 5, name: "cat5", classification: "狸花" },
-            // { _id: 6, name: "cat6", classification: "所有" }
-            // 在这里添加更多喵星的猫
+            { 
+                _id: 4, 
+                name: "薏米", 
+                classification: "纯色",
+                info: "薏米曾是校园里最受欢迎的猫咪之一，她有着漂亮的白色毛发和温柔的性格。她为校园带来了很多欢乐，永远活在大家的记忆中。"
+            }
         ];
 
         const url = "/images/";
 
         function showCatDetails(classification) {
+            // 记录上一级状态
+            previousView = {
+                type: 'main',
+                classification: classification
+            };
+
             // 隐藏所有标签页内容
             document.querySelectorAll('#content > div').forEach(div => {
                 div.style.display = 'none';
@@ -273,22 +358,43 @@
             const container = document.getElementById(containerId);
             container.innerHTML = '';
             data.forEach(item => {
-                const a = document.createElement('a');
-                a.href = `/404.html?_id=${item._id}`;
-                a.innerHTML = `
+                const div = document.createElement('div');
+                div.innerHTML = `
                     <div class="catitem" onclick="showCatDetailInfo(${item._id})" data-_id="${item._id}">
                         <img class="avator" src="${url}${item.name}.png" alt="Avatar">
                         <div class="cat-name">${item.name}</div>
                     </div>
                     <div class="divLine"></div>
                 `;
-                container.appendChild(a);
+                container.appendChild(div);
             });
         }
 
         function showCatDetailInfo(id) {
-            // 处理点击猫的名字后显示详细信息的逻辑
-            window.location.href = `/404.html?_id=${id}`;
+            const cat = [...fostered_cat, ...unknown_cat, ...dead_cat].find(c => c._id === id);
+            if (!cat) return;
+
+            // 如果是从分类页面点击进来的，记录分类页面状态
+            if (document.getElementById('catDetails').style.display === 'block') {
+                previousView = {
+                    type: 'category',
+                    classification: document.getElementById('categoryTitle').textContent
+                };
+            }
+
+            // 隐藏所有其他内容
+            document.querySelectorAll('#content > div').forEach(div => {
+                div.style.display = 'none';
+            });
+
+            // 显示详情页
+            document.getElementById('catDetailPage').style.display = 'block';
+            
+            // 更新详情内容
+            document.getElementById('catDetailName').textContent = cat.name;
+            document.getElementById('catDetailImage').src = `${url}${cat.name}.png`;
+            document.getElementById('catDetailClassification').textContent = cat.classification;
+            document.getElementById('catDetailInfo').textContent = cat.info || '暂无详细信息';
         }
 
         navbarTap(0); // 初始化显示在校内容
@@ -345,7 +451,12 @@
                         </div>
                     `;
                     div.onclick = () => {
-                        window.location.href = `404.html?_id=${cat._id}&classification=${encodeURIComponent(cat.classification)}`;
+                        // 从搜索结果点击时，设置返回到主页
+                        previousView = {
+                            type: 'main',
+                            classification: ''
+                        };
+                        showCatDetailInfo(cat._id);
                     };
                     searchResults.appendChild(div);
                 });
@@ -400,6 +511,19 @@
                 searchCats();
             }
         });
+
+        // 修改返回主页面的函数
+        function backToMain() {
+            document.getElementById('catDetailPage').style.display = 'none';
+            
+            if (previousView.type === 'category') {
+                // 返回到分类页面
+                showCatDetails(previousView.classification);
+            } else {
+                // 返回到主页面
+                navbarTap(currentTab);
+            }
+        }
     </script>
 </body>
 </html>
