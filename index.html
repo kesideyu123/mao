@@ -261,10 +261,11 @@
             // 更新分类标题
             document.getElementById('categoryTitle').textContent = classification;
             
-            // 过滤并显示相应分类的猫咪
+            // 修改这里：从所有数组中筛选对应分类的猫咪
             const data = classification === '所有' 
                 ? [...fostered_cat, ...unknown_cat, ...dead_cat]
-                : fostered_cat.filter(cat => cat.classification === classification);
+                : [...fostered_cat, ...unknown_cat, ...dead_cat].filter(cat => cat.classification === classification);
+            
             renderCats(data, 'catList');
         }
 
@@ -273,7 +274,7 @@
             container.innerHTML = '';
             data.forEach(item => {
                 const a = document.createElement('a');
-                a.href = `/catDetail.html?_id=${item._id}`;
+                a.href = `/404.html?_id=${item._id}`;
                 a.innerHTML = `
                     <div class="catitem" onclick="showCatDetailInfo(${item._id})" data-_id="${item._id}">
                         <img class="avator" src="${url}${item.name}.png" alt="Avatar">
@@ -287,7 +288,7 @@
 
         function showCatDetailInfo(id) {
             // 处理点击猫的名字后显示详细信息的逻辑
-            window.location.href = `/catDetail.html?_id=${id}`;
+            window.location.href = `/404.html?_id=${id}`;
         }
 
         navbarTap(0); // 初始化显示在校内容
@@ -344,7 +345,7 @@
                         </div>
                     `;
                     div.onclick = () => {
-                        window.location.href = `catDetail/catDetail.html?_id=${cat._id}&classification=${encodeURIComponent(cat.classification)}`;
+                        window.location.href = `404.html?_id=${cat._id}&classification=${encodeURIComponent(cat.classification)}`;
                     };
                     searchResults.appendChild(div);
                 });
